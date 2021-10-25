@@ -29,7 +29,7 @@ public class OrderInteractiveQuery {
         }
     }
 
-    public List<String> getBrandList() {
+  /*  public List<String> getBrandList() {
         List<String> brandList = new ArrayList<>();
         KeyValueIterator<String, Long> all = brandStore().all();
         while (all.hasNext()) {
@@ -37,10 +37,10 @@ public class OrderInteractiveQuery {
             brandList.add(next);
         }
         return brandList;
-    }
+    } */
 
 
-    private ReadOnlyKeyValueStore<String, Long> brandStore() {
+    private ReadOnlyKeyValueStore<String, Long> orderStore() {
         return this.interactiveQueryService.getQueryableStore(OrderStreamProcessing.ORDER_STATE_STORE,
                 QueryableStoreTypes.keyValueStore());
     }
