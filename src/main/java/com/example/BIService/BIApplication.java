@@ -13,6 +13,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+import java.util.function.Consumer;
 
 @SpringBootApplication
 public class BIApplication {
@@ -22,6 +23,12 @@ public class BIApplication {
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(BIApplication.class);
+	private static final Logger log2 = LoggerFactory.getLogger(BIApplication.class);
+
+	@Bean
+	public Consumer<cProductTotal> consume() {
+		return input -> log2.info(input.toString());
+	}
 
 
 	@Bean
@@ -35,9 +42,9 @@ public class BIApplication {
 			Long i = 0L;
 			try {
 				while (!Thread.currentThread().isInterrupted()){
-	
+					//
 					//The binder name "appliance-outbound" is defined in the application.yml.
-					streamBridge.send("order-outbound", new cOrder(i++, i++, "Hammer", 1));
+					streamBridge.send("appliance-outbound", new cOrder(i++, i++, "Hammer", 1));
 					Thread.sleep(1200);
 				}
 			}

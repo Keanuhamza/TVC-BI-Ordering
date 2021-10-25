@@ -39,9 +39,9 @@ public class OrderStreamProcessing {
                 return KeyValue.pair(new_key, v);
             }).toTable(
                     Materialized.<String, cOrder, KeyValueStore<Bytes, byte[]>>as(ORDER_STATE_STORE).
-                            withKeySerde(Serdes.String())
+                            withKeySerde(Serdes.String()).
                             // a custom value serde for this state store
-                           // withValueSerde(orderSerde())
+                            withValueSerde(orderSerde())
             );
             
             KTable<String, Long> orderKTable = inputStream.
@@ -69,7 +69,7 @@ public class OrderStreamProcessing {
     public Serde<cOrder> orderSerde() {
         final JsonSerde<cOrder> orderJsonSerde = new JsonSerde<>();
         Map<String, Object> configProps = new HashMap<>();
-        configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.example.BIService.cOrder");
+        configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.example.BIService.models.cOrder");
         configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         orderJsonSerde.configure(configProps, false);
         return orderJsonSerde;
