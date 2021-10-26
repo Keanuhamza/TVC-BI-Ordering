@@ -15,27 +15,30 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 import com.example.BIService.models.*;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+	
 @Configuration
 public class OrderStreamProcessing {
     public final static String ORDER_STATE_STORE = "order-store";
     public final static String PRODUCT_TOTAL_STATE_STORE = "product-total-store";
+    private static final Logger log = LoggerFactory.getLogger(com.example.BIService.BIApplication.class);
 
     @Bean
     public Function<KStream<?, cOrder>, KStream<String, cProductTotal>> process() {
+        log.info("\ncalled\n");
         return inputStream -> {
-            
 
             inputStream.map((k, v) -> {
 
                 String new_key = v.getProductName();
-                System.out.println(new_key + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 return KeyValue.pair(new_key, v);
             }).toTable(
                     Materialized.<String, cOrder, KeyValueStore<Bytes, byte[]>>as(ORDER_STATE_STORE).

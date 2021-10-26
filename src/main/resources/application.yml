@@ -4,11 +4,35 @@ spring.cloud.stream:
   bindings:
     appliance-outbound:
       destination: appliance-topic
+    process-in-0:
+      destination: appliance-topic
+    process-out-0:
+      destination: brand-topic
   kafka.binder:
     configuration:
       commit.interval.ms: 1000
     brokers: localhost:9092
     serdeError: logAndContinue
+  kafka.streams.binder:
+    brokers: localhost:9092
+    configuration:
+      commit.interval.ms: 1000
+    serdeError: logAndContinue
+  kafka.streams.bindings:
+    process-in-0:
+      consumer:
+        configuration:
+          default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+          default.value.serde: org.springframework.kafka.support.serializer.JsonSerde
+          spring.json.trusted.packages: ""
+          spring.json.value.default.type: com.example.BIService.models.cOrder
+    process-out-0:
+      producer:
+        configuration:
+          default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+          default.value.serde: org.springframework.kafka.support.serializer.JsonSerde
+          spring.json.trusted.packages: ""
+          spring.json.value.default.type: com.example.BIService.models.cProductTotal
   kafka.bindings:
     appliance-outbound:
       producer:
@@ -20,46 +44,5 @@ spring.cloud.stream:
 
 
 
-bindings:
-  process-in-0:
-    destination: appliance-topic
-  process-out-0:
-    destination: brand-topic
-kafka.streams.binder:
-  brokers: localhost:9092
-  configuration:
-    commit.interval.ms: 1000
-  serdeError: logAndContinue
-kafka.streams.bindings:
-  process-in-0:
-    consumer:
-      configuration:
-        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-        default.value.serde: org.springframework.kafka.support.serializer.JsonSerde
-        spring.json.trusted.packages: ""
-        spring.json.value.default.type: com.example.BIService.models.cOrder
-  process-out-0:
-    producer:
-      configuration:
-        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-        default.value.serde: org.springframework.kafka.support.serializer.JsonSerde
-        spring.json.trusted.packages: ""
-        spring.json.value.default.type: com.example.BIService.models.cProductTotal
 
 
-  bindings:
-    consume-in-0:
-      destination: brand-topic
-  kafka.binder:
-    configuration:
-      commit.interval.ms: 1000
-    brokers: localhost:9092
-    serdeError: logAndContinue
-  kafka.bindings:
-    consume-in-0:
-      consumer:
-        configuration:
-          default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-          default.value.serde: org.springframework.kafka.support.serializer.JsonSerde
-          spring.json.trusted.packages: '*'
-          spring.json.value.default.type: com.example.BIService.models.cProductTotal

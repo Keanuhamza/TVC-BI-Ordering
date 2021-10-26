@@ -23,11 +23,10 @@ public class BIApplication {
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(BIApplication.class);
-	private static final Logger log2 = LoggerFactory.getLogger(BIApplication.class);
-
+	
 	@Bean
 	public Consumer<cProductTotal> consume() {
-		return input -> log2.info(input.toString());
+		return input -> log.info(input.toString());
 	}
 
 
@@ -37,18 +36,21 @@ public class BIApplication {
 	}
 
 	@Bean
-	public CommandLineRunner run(RestTemplate restTemplate, StreamBridge streamBridge) throws Exception {
+	public CommandLineRunner run(StreamBridge streamBridge) throws Exception {
 		return args -> {
-			Long i = 0L;
+			Long i = 1L;
 			try {
-				while (!Thread.currentThread().isInterrupted()){
-					//
+				while (i < 20L){
+					cOrder order = new cOrder(i, i, "Hammer", 1);
+					log.info(order.toString());
 					//The binder name "appliance-outbound" is defined in the application.yml.
-					streamBridge.send("appliance-outbound", new cOrder(i++, i++, "Hammer", 1));
-					Thread.sleep(1200);
+					streamBridge.send("appliance-outbound", order);
+					
+					i = i + 1L;
 				}
 			}
-			catch(InterruptedException ignored){}
+			catch(Exception ignored){}
+			return;
 		};
 	}
 
