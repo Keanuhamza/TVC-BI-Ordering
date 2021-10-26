@@ -8,6 +8,7 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Printed;
+import org.apache.kafka.streams.kstream.Reducer;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.hibernate.criterion.Order;
 import org.springframework.context.annotation.Bean;
@@ -47,14 +48,23 @@ public class OrderStreamProcessing {
                             withValueSerde(orderSerde())
             );
             
-            KTable<String, Long> orderKTable = inputStream.
-                    mapValues(cOrder::getProductName).
-                    groupBy((keyIgnored, value) -> value).
-                    count(
-                            Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as(PRODUCT_TOTAL_STATE_STORE).
-                                    withKeySerde(Serdes.String()).
-                                    withValueSerde(Serdes.Long())
-                    );
+            KTable<String, Integer> orderKTable = inputStream.
+                    map((k, v) -> {
+
+                        String new_key = v.getProductName();
+                        return KeyValue.pair(new_key, v.getQuantity());
+                    }).
+                    groupBy((key, value) -> key)
+                    .reduce( 
+                            new Reducer<Integer>() {
+                        
+                        @Override
+                         public Integer apply(Integer currentMax, Integer v) {
+                            Integer max = currentMax + v;
+                                return max;
+                            }
+
+                         });
 
             KStream<String, cProductTotal> productQuantityStream = orderKTable.
                     toStream().
