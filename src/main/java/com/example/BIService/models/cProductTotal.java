@@ -5,12 +5,13 @@ import javax.persistence.*;
 public class cProductTotal {
 
 	private String productName;
-	private int total;
+	private Long total;
 
 	public cProductTotal() {
 	}
 
-	public cProductTotal(String productName, int total) {
+
+	public cProductTotal(String productName, Long total) {
 		this.productName = productName;
 		this.total = total;
 	}
@@ -31,11 +32,11 @@ public class cProductTotal {
 		this.productName = productName;
 	}
 
-	public int getTotal() {
+	public Long getTotal() {
 		return this.total;
 	}
 
-	public void setTotal(int total) {
+	public void setTotal(Long total) {
 		this.total = total;
 	}
 

@@ -1,4 +1,5 @@
 package com.example.BIService.services;
+
 import org.apache.catalina.connector.CoyoteReader;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -16,7 +17,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -25,11 +25,13 @@ import com.example.BIService.models.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-	
+
 @Configuration
 public class OrderStreamProcessing {
     public final static String ORDER_STATE_STORE = "order-store";
     public final static String PRODUCT_TOTAL_STATE_STORE = "product-total-store";
+    public final static String ORDER_CUSTOMER_STATE_STORE = "order-cost-customer-state";
+
     private static final Logger log = LoggerFactory.getLogger(com.example.BIService.BIApplication.class);
 
     @Bean
@@ -47,24 +49,36 @@ public class OrderStreamProcessing {
                             // a custom value serde for this state store
                             withValueSerde(orderSerde())
             );
+
+            inputStream.map((k, v) -> {
+
+                Long new_key = v.getCustID();
+                return KeyValue.pair(new_key, v);
+            }).toTable(
+                    Materialized.<Long, cOrder, KeyValueStore<Bytes, byte[]>>as(ORDER_CUSTOMER_STATE_STORE).
+                            withKeySerde(Serdes.Long()).
+                            // a custom value serde for this state store
+                            withValueSerde(orderSerde())
+            );
+        
             
-            KTable<String, Integer> orderKTable = inputStream.
+            
+
+
+            KTable<String, Long> orderKTable = inputStream.
                     map((k, v) -> {
 
                         String new_key = v.getProductName();
-                        return KeyValue.pair(new_key, v.getQuantity());
+                        return KeyValue.pair(new_key, (long)v.getQuantity());
                     }).
                     groupBy((key, value) -> key)
-                    .reduce( 
-                            new Reducer<Integer>() {
-                        
-                        @Override
-                         public Integer apply(Integer currentMax, Integer v) {
-                            Integer max = currentMax + v;
-                                return max;
-                            }
-
-                         });
+                    .reduce(new Reducer<Long>() {public Long apply(Long currentMax, Long v) {
+                        Long max = currentMax + v;
+                        return max;
+                    } }, Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as(PRODUCT_TOTAL_STATE_STORE).
+                        withKeySerde(Serdes.String()).
+                    // a custom value serde for this state store
+                        withValueSerde(Serdes.Long()));
 
             KStream<String, cProductTotal> productQuantityStream = orderKTable.
                     toStream().
@@ -76,8 +90,7 @@ public class OrderStreamProcessing {
         };
     }
 
-
-    // Can compare the following configuration properties 
+    // Can compare the following configuration properties
     // with those defined in application.yml
     public Serde<cOrder> orderSerde() {
         final JsonSerde<cOrder> orderJsonSerde = new JsonSerde<>();

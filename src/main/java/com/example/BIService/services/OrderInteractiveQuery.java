@@ -1,6 +1,8 @@
 package com.example.BIService.services;
 
 import com.example.BIService.*;
+import com.example.BIService.models.cOrder;
+
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
@@ -21,29 +23,42 @@ public class OrderInteractiveQuery {
         this.interactiveQueryService = interactiveQueryService;
     }
 
-    public long getProductOrderQuantity(String productName) {
-        if (orderStore().get(productName) != null) {
-            return orderStore().get(productName);
-        } else {
-            throw new NoSuchElementException(); //TODO: should use a customised exception.
-        }
-    }
-
-  /*  public List<String> getBrandList() {
-        List<String> brandList = new ArrayList<>();
-        KeyValueIterator<String, Long> all = brandStore().all();
+    public float getCustomerCostList(Long a) {
+        float totalCost = 0f;
+        KeyValueIterator<Long, cOrder> all = orderCustomerStore().range(a, a);
         while (all.hasNext()) {
-            String next = all.next().key;
-            brandList.add(next);
+            cOrder next = all.next().value;
+
+            totalCost += next.getProdPrice();
         }
-        return brandList;
-    } */
+        return totalCost;
+    } 
+
+    public List<String> getCustomerOrdersList(Long a) {
+        List<String> totalOrders = new ArrayList<>();
+        KeyValueIterator<Long, cOrder> all = orderCustomerStore().range(a, a);
+        while (all.hasNext()) {
+            cOrder next = all.next().value;
+
+            totalOrders.add(next.toString());
+        }
+        return totalOrders;
+    } 
+
+    
 
 
-    private ReadOnlyKeyValueStore<String, Long> orderStore() {
+    private ReadOnlyKeyValueStore<String, cOrder> orderStore() {
         return this.interactiveQueryService.getQueryableStore(OrderStreamProcessing.ORDER_STATE_STORE,
                 QueryableStoreTypes.keyValueStore());
     }
+
+    private ReadOnlyKeyValueStore<Long, cOrder> orderCustomerStore() {
+        return this.interactiveQueryService.getQueryableStore(OrderStreamProcessing.ORDER_CUSTOMER_STATE_STORE,
+                QueryableStoreTypes.keyValueStore());
+    }
+
+   
 
 
 

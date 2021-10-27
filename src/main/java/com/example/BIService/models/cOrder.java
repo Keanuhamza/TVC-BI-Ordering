@@ -1,8 +1,9 @@
 package com.example.BIService.models;
 
 import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class cOrder {
 	
     private @Id @GeneratedValue Long id;
@@ -11,12 +12,24 @@ public class cOrder {
     private Long custPhone;
 	private String productName;
 	private float prodPrice;
-	private int quantity;
+	private Integer quantity;
     
 	//Constructors
 	public cOrder() {}
 
-	public cOrder(Long id, Long custID, String productName, int quantity) {
+	public cOrder(Long id, Long custID, 
+	String custAddress, Long custPhone, 
+	String productName, float prodPrice, Integer quantity) {
+		this.id = id;
+		this.custID = custID;
+		this.custAddress = custAddress;
+		this.custPhone = custPhone;
+		this.productName = productName;
+		this.prodPrice = prodPrice;
+		this.quantity = quantity;
+	}
+
+	public cOrder(Long id, Long custID, String productName, Integer quantity) {
 		this.id = id;
 		this.custID = custID;
 		this.productName = productName;
@@ -27,16 +40,15 @@ public class cOrder {
 		custPhone = 0L;
 	}
 
-	public cOrder(Long id, Long custID, 
-	String custAddress, Long custPhone, 
-	String productName, float prodPrice, int quantity) {
-		this.id = id;
-		this.custID = custID;
-		this.custAddress = custAddress;
-		this.custPhone = custPhone;
-		this.productName = productName;
-		this.prodPrice = prodPrice;
+	public cOrder(Integer quantity) {
+		this.id = -1L;
+		this.custID = -1L;
+		this.productName = "";
 		this.quantity = quantity;
+
+		prodPrice = 0f;
+		custAddress = "null";
+		custPhone = 0L;
 	}
 
 	//Setters and Getters
@@ -76,10 +88,10 @@ public class cOrder {
 	public void setProdPrice(float prodPrice) {
 		this.prodPrice = prodPrice;
 	}
-	public int getQuantity() {
+	public Integer getQuantity() {
 		return quantity;
 	}
-	public void setQuantity(int quantity) {
+	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
 	
