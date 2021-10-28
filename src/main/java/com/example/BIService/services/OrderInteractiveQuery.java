@@ -23,24 +23,29 @@ public class OrderInteractiveQuery {
         this.interactiveQueryService = interactiveQueryService;
     }
 
-    public float getCustomerCostList(Long a) {
+    public float getCustomerCost(Long a) {
         float totalCost = 0f;
-        KeyValueIterator<Long, cOrder> all = orderCustomerStore().range(a, a);
+        KeyValueIterator<Long, cOrder> all = orderCustomerStore().all();
         while (all.hasNext()) {
             cOrder next = all.next().value;
-
-            totalCost += next.getProdPrice();
+            if (next.getCustID() == a) {
+                totalCost += next.getProdPrice() * (float)next.getQuantity();
+            }
+                
         }
         return totalCost;
     } 
 
     public List<String> getCustomerOrdersList(Long a) {
         List<String> totalOrders = new ArrayList<>();
-        KeyValueIterator<Long, cOrder> all = orderCustomerStore().range(a, a);
+        KeyValueIterator<Long, cOrder> all = orderCustomerStore().all();
         while (all.hasNext()) {
+            System.out.println("");
             cOrder next = all.next().value;
-
-            totalOrders.add(next.toString());
+            if (next.getCustID() == a) {
+                totalOrders.add(next.toString());
+            }
+                
         }
         return totalOrders;
     } 

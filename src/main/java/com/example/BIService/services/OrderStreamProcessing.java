@@ -52,7 +52,7 @@ public class OrderStreamProcessing {
 
             inputStream.map((k, v) -> {
 
-                Long new_key = v.getCustID();
+                Long new_key = v.getId();
                 return KeyValue.pair(new_key, v);
             }).toTable(
                     Materialized.<Long, cOrder, KeyValueStore<Bytes, byte[]>>as(ORDER_CUSTOMER_STATE_STORE).

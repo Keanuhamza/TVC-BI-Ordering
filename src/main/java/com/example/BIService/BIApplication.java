@@ -36,7 +36,7 @@ public class BIApplication {
 	public RestTemplate restTemplate(RestTemplateBuilder builder) {
 		return builder.build();
 	}
-
+/*
 	@Bean
 	public CommandLineRunner run(StreamBridge streamBridge) throws Exception {
 		return args -> {
@@ -54,7 +54,7 @@ public class BIApplication {
 			}
 			catch(Exception ignored){}
 			return;
-		};
-	}
+		}; 
+	}*/
 
 }
