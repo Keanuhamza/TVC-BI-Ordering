@@ -19,13 +19,13 @@ public class OrderQueryController {
   private OrderInteractiveQuery orderInteractiveQuery;
 
 
-    // Single item
+    // get total cost for all orders from a customer
   @GetMapping("/totalCostForCust/{id}")
   float getTotalCost(@PathVariable Long id) {
     return orderInteractiveQuery.getCustomerCost(id);
   }
 
-  // Single item
+  // get all the orders from a customer
   @GetMapping("/getOrdersForCust/{id}")
   List<String> oneCustomer(@PathVariable Long id) {
     return orderInteractiveQuery.getCustomerOrdersList(id);

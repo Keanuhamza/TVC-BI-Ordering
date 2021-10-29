@@ -28,27 +28,13 @@ import org.slf4j.LoggerFactory;
 
 @Configuration
 public class OrderStreamProcessing {
-    public final static String ORDER_STATE_STORE = "order-store";
-    public final static String PRODUCT_TOTAL_STATE_STORE = "product-total-store";
     public final static String ORDER_CUSTOMER_STATE_STORE = "order-cost-customer-state";
-
-    private static final Logger log = LoggerFactory.getLogger(com.example.BIService.BIApplication.class);
+    public final static String PRODUCT_TOTAL_STATE_STORE = "product-total-store";
 
     @Bean
     public Function<KStream<?, cOrder>, KStream<String, cProductTotal>> process() {
-        log.info("\ncalled\n");
+
         return inputStream -> {
-
-            inputStream.map((k, v) -> {
-
-                String new_key = v.getProductName();
-                return KeyValue.pair(new_key, v);
-            }).toTable(
-                    Materialized.<String, cOrder, KeyValueStore<Bytes, byte[]>>as(ORDER_STATE_STORE).
-                            withKeySerde(Serdes.String()).
-                            // a custom value serde for this state store
-                            withValueSerde(orderSerde())
-            );
 
             inputStream.map((k, v) -> {
 
@@ -60,8 +46,6 @@ public class OrderStreamProcessing {
                             // a custom value serde for this state store
                             withValueSerde(orderSerde())
             );
-        
-            
             
 
 
@@ -85,7 +69,7 @@ public class OrderStreamProcessing {
                     map((k, v) -> KeyValue.pair(k, new cProductTotal(k, v)));
             // use the following code for testing
             productQuantityStream.print(Printed.<String, cProductTotal>toSysOut().withLabel("Console Output"));
-            
+ 
             return productQuantityStream;
         };
     }

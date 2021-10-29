@@ -23,19 +23,21 @@ public class OrderInteractiveQuery {
         this.interactiveQueryService = interactiveQueryService;
     }
 
+    // get customer cost method
     public float getCustomerCost(Long a) {
-        float totalCost = 0f;
+        float totalCost = 0f; // initialize cost
         KeyValueIterator<Long, cOrder> all = orderCustomerStore().all();
         while (all.hasNext()) {
-            cOrder next = all.next().value;
-            if (next.getCustID() == a) {
-                totalCost += next.getProdPrice() * (float)next.getQuantity();
+            cOrder next = all.next().value; 
+            if (next.getCustID() == a) { // if the order is from the customer
+                totalCost += next.getProdPrice() * (float)next.getQuantity(); // add cost
             }
                 
         }
-        return totalCost;
+        return totalCost; // return total cost
     } 
 
+    // method to get total customer orders
     public List<String> getCustomerOrdersList(Long a) {
         List<String> totalOrders = new ArrayList<>();
         KeyValueIterator<Long, cOrder> all = orderCustomerStore().all();
@@ -49,14 +51,6 @@ public class OrderInteractiveQuery {
         }
         return totalOrders;
     } 
-
-    
-
-
-    private ReadOnlyKeyValueStore<String, cOrder> orderStore() {
-        return this.interactiveQueryService.getQueryableStore(OrderStreamProcessing.ORDER_STATE_STORE,
-                QueryableStoreTypes.keyValueStore());
-    }
 
     private ReadOnlyKeyValueStore<Long, cOrder> orderCustomerStore() {
         return this.interactiveQueryService.getQueryableStore(OrderStreamProcessing.ORDER_CUSTOMER_STATE_STORE,
