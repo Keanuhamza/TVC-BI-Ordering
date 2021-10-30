@@ -3,11 +3,11 @@ server.port: 8182
 spring.cloud.stream:
   bindings:
     consume-in-0:
-      destination: brand-topic
+      destination: product-topic
     process-in-0:
-        destination: appliance-topic
+        destination: order-topic
     process-out-0:
-        destination: brand-topic
+        destination: product-topic
   kafka.binder:
     configuration:
       commit.interval.ms: 1000

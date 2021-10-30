@@ -35,7 +35,7 @@ public class OrderStreamProcessing {
     public Function<KStream<?, cOrder>, KStream<String, cProductTotal>> process() {
 
         return inputStream -> {
-
+ 
             inputStream.map((k, v) -> {
 
                 Long new_key = v.getId();
@@ -48,7 +48,7 @@ public class OrderStreamProcessing {
             );
             
 
-
+            // Table that stores the total cost for each product
             KTable<String, Long> orderKTable = inputStream.
                     map((k, v) -> {
 
